@@ -1,0 +1,855 @@
+module FootholdRole {
+
+    export class Foothold extends Laya.Sprite {
+
+        private m_sp:Laya.Sprite;
+        private m_parent:any;
+        private foothold_map:Array<any> = [];
+        private ladderRope_map:Array<any> = [];
+        private spx:Array<any> = [];
+
+        public newline:Array<any> = [];
+        public newline2:Array<any> = [];
+        public newline3:Array<any> = [];
+        public addLines:Array<any> = [];
+        public rmvines:Array<any> = [];
+        public line:Array<any> = [];
+        public ladder:Array<any> = [];
+        public maxz:number = 0;
+
+        public clearUp() : void {
+            Laya.timer.clearAll(this);
+            for(let i:number = 0; i < this.spx.length; i++) {
+                if(this.spx[i]) {
+                    this.spx[i].removeSelf();
+                    this.spx[i].destroy(true);
+                    this.spx[i] = null;
+                }
+            }
+            if(this.m_sp) {
+                this.m_sp.removeSelf();
+                this.m_sp.destroy(true);
+                this.m_sp = null;
+            }
+            this.foothold_map = [];
+            this.ladderRope_map = [];
+            this.newline = [];
+            this.ladder = [];
+            this.maxz = 0;
+            // this.linePos = [];
+            // this.ropePos = [];
+        }
+
+        // findLst(lst:any, flag:number) : void {
+        //     if(flag == 1) this.find1(lst.prev, lst.next, lst.fl)
+        //     else this.find2(lst.prev, lst.next, lst.fl)
+        // }
+
+        // //1     0
+        // find2(prev:number, next:number, fl:string) : void {
+
+
+        //     let i:number = this.findNext(prev, fl);
+        //     if(i != -1) {
+        //         let _prev = this.newline[i].prev;
+        //         let _next = this.newline[i].next;
+
+        //         //一对
+        //         // let __ = this.rmvLines.length;
+        //         // this.rmvLines[__] = new Object();
+        //         // this.rmvLines[__].fl = fl;
+        //         // this.rmvLines[__].key = prev + "_" + next;
+
+        //         // this.rmvLines[this.rmvLines.length] = _prev + "_" + _next;
+
+        //         let __ = this.rmvLines.length;
+        //         this.rmvLines[__] = new Object();
+        //         this.rmvLines[__].fl = fl;
+        //         this.rmvLines[__].key =  _prev + "_" + _next;
+
+        //         //对方的prev
+        //         let j:number = this.findNext(_prev, fl);
+        //         if(j != -1) {
+        //             return this.find2(_prev, _next, fl);
+        //         }
+        //     }
+        // }
+
+        //0     1
+        // find1(prev:number, next:number, fl:string) : void {            //已知我方prev和【next】
+
+
+        //     let i:number = this.findPrev(next, fl);             //找到【prev】
+        //     if(i != -1) {
+        //         let _prev = this.newline[i].prev;
+        //         let _next = this.newline[i].next;
+
+        //         //一对
+        //         // let __ = this.rmvLines.length;
+        //         // this.rmvLines[__] = new Object();
+        //         // this.rmvLines[__].fl = fl;
+        //         // this.rmvLines[__].key = prev + "_" + next;
+
+        //         let __ = this.rmvLines.length;
+        //         this.rmvLines[__] = new Object();
+        //         this.rmvLines[__].fl = fl;
+        //         this.rmvLines[__].key =  _prev + "_" + _next;
+
+        //         // this.rmvLines[this.rmvLines.length] = prev + "_" + next;
+        //         // this.rmvLines[this.rmvLines.length] = _prev + "_" + _next;
+        //         //对方的next
+        //         let j:number = this.findPrev(_next, fl);
+        //         if(j != -1) {
+
+        //             return this.find1(_prev, _next, fl);
+        //         }
+        //     }
+        // }
+        /*
+        63  foothold.4.2
+Foothold.ts:76 68  foothold.4.2
+Foothold.ts:76 65  foothold.4.2
+Foothold.ts:76 70  foothold.4.2
+Foothold.ts:76 57  foothold.4.2
+Foothold.ts:76 63  foothold.4.2
+Foothold.ts:76 68  foothold.4.2
+        */
+
+        // findAll(fl:string) : void {
+        //     for(let i:number = 0; i < this.newline.length; i++) {
+        //         if(this.newline[i].x1 == this.newline[i].x2) {
+        //             if(fl == this.newline[i].fl) {
+        //                 let _prev = this.newline[i].prev;
+        //                 let _next = this.newline[i].next;
+
+        //                 let __ = this.rmvLines.length;
+        //                 this.rmvLines[__] = new Object();
+        //                 this.rmvLines[__].fl = fl;
+        //                 this.rmvLines[__].key =  _prev + "_" + _next;
+        //             }
+        //         }
+        //     }
+        // }
+
+        // findNext(next:number, fl:string) : number {
+        //     for(let i:number = 0; i < this.newline.length; i++) {
+        //         if(this.newline[i].x1 == this.newline[i].x2) {
+        //             if(this.newline[i].next == next && fl == this.newline[i].fl) {
+        //                 return i;
+        //             }
+        //         }
+        //     }
+        //     return -1;
+        // }
+
+        // findPrev(prev:number, fl:string) : number {
+        //     for(let i:number = 0; i < this.newline.length; i++) {
+        //         if(this.newline[i].x1 == this.newline[i].x2) {
+        //             if(this.newline[i].prev == prev && fl == this.newline[i].fl) {
+        //                 return i;
+        //             }
+        //         }
+        //     }
+        //     return -1;
+        // }
+
+        segmentsIntr(p0_x:number, p0_y:number, p1_x:number, p1_y:number, p2_x:number, p2_y:number, p3_x:number, p3_y:number) : boolean {
+            let s10_x = p1_x - p0_x;
+            let s10_y = p1_y - p0_y;
+            let s32_x = p3_x - p2_x;
+            let s32_y = p3_y - p2_y;
+
+            let denom = s10_x * s32_y - s32_x * s10_y;
+            if (denom == 0)//平行或共线
+                return false; // Collinear
+            let denomPositive:boolean = denom > 0;
+
+            let s02_x = p0_x - p2_x;
+            let s02_y = p0_y - p2_y;
+            let s_numer = s10_x * s02_y - s10_y * s02_x;
+            if ((s_numer < 0) == denomPositive)//参数是大于等于0且小于等于1的，分子分母必须同号且分子小于等于分母
+                return false; // No collision
+
+            let t_numer = s32_x * s02_y - s32_y * s02_x;
+            if ((t_numer < 0) == denomPositive)
+                return false; // No collision
+
+            if (Math.abs(s_numer) > Math.abs(denom) || Math.abs(t_numer) > Math.abs(denom))
+                return false; // No collision
+            // Collision detected
+
+            return true;
+        }
+
+        find0Line(lineInfo:any, index:number) : boolean {
+            let e = 0;
+            for(let i:number = 0; i < this.newline.length; i++) {
+                // if(this.newline[i].fl == lineInfo.fl) {  //任何线相交都不行
+                    let a = {x:Number(this.newline[i].x1), y:Number(this.newline[i].y1)};
+                    let b = {x:Number(this.newline[i].x2), y:Number(this.newline[i].y2)};
+                    let c = {x:Number(lineInfo.x1), y:Number(lineInfo.y1)};
+                    let d = {x:Number(lineInfo.x2), y:Number(lineInfo.y2)};
+                    if(this.segmentsIntr(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y)) {
+                        e = 1;
+                        if(this.newline[i].y1 == this.newline[i].y2) {
+                            return false;
+                        }
+                        else {
+                            return this.find0Line(this.newline[i], index+1);
+                        }
+                    }
+                // }
+            }
+            if(e == 0) {
+                if(index == 0) return false;
+                return true;
+            }
+        }
+
+        // findNext(lineInfo:any) : any {
+        //     for(let i:number = 0; i < this.newline.length; i++) {
+        //         if(this.newline[i].fl == lineInfo.fl) {
+        //         }
+        //     }
+        //     return 0;
+        // }
+
+        find0Line2(lineInfo:any) : void {
+            if(lineInfo.prev == 0 || lineInfo.next == 0) {//
+                for(let i:number = 0; i < this.newline.length; i++) {
+                    if(this.newline[i].fl == lineInfo.fl) {
+                        if(this.newline[i].y1 == this.newline[i].y2) {
+                            if(this.newline[i].x1 == lineInfo.x2 && this.newline[i].y1 == lineInfo.y2) {
+                                return ;
+                            }
+                            if(this.newline[i].x2 == lineInfo.x1 && this.newline[i].y2 == lineInfo.y1) {
+                                return ;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                return ;
+            }
+            this.addLines.push(lineInfo);
+            return this.findH(lineInfo);
+        }
+
+        findRmvLine(lineInfo:any, prev:number, next:number) : void {
+            for(let i:number = 0; i < this.newline2.length; i++) {
+                if(this.newline2[i].fl == lineInfo.fl) {  //任何线相交都不行
+                    if(this.newline2[i].x1 == this.newline2[i].x2) {
+
+                        let minY = Math.min(lineInfo.y1, lineInfo.y2);
+                        if(this.newline2[i].y1 < minY || this.newline2[i].y2 < minY) {
+                            if(this.newline2[i].x1 == lineInfo.x1 && this.newline2[i].y1 == lineInfo.y1) {
+                                this.rmvLines.push(this.newline2[i]);
+                                return this.findRmvLine(this.newline2[i], this.newline2[i].prev, this.newline2[i].next);
+                            }
+                            if(this.newline2[i].x2 == lineInfo.x1 && this.newline2[i].y2 == lineInfo.y1) {
+                                this.rmvLines.push(this.newline2[i]);
+                                return this.findRmvLine(this.newline2[i], this.newline2[i].prev, this.newline2[i].next);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        findLine(lineInfo:any) : void {
+            if(lineInfo.prev != 0 && lineInfo.next != 0) {//
+                for(let i:number = 0; i < this.newline.length; i++) {
+                    if(this.newline[i].fl == lineInfo.fl) {
+                        // if(this.newline[i].x1 == lineInfo.x1 && this.newline[i].y1 == lineInfo.y1 &&
+                        // this.newline[i].x2 == lineInfo.x2 && this.newline[i].y2 == lineInfo.y2) {
+                        //     //自己需要排除
+                        // }
+                        // else {
+                            // ///这里应该改成线段相交
+                            // let a = {x:Number(this.newline[i].x1), y:Number(this.newline[i].y1)};
+                            // let b = {x:Number(this.newline[i].x2), y:Number(this.newline[i].y2)};
+                            // let c = {x:Number(lineInfo.x1), y:Number(lineInfo.y1)};
+                            // let d = {x:Number(lineInfo.x2), y:Number(lineInfo.y2)};
+                            // if(this.segmentsIntr(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y)) {
+                            //     console.log("相交1")
+                            //     this.addLines.push(lineInfo);
+                            //     return this.findH(lineInfo);
+                            // }
+                            // a = {x:Number(this.newline[i].x1), y:Number(this.newline[i].y1)};
+                            // b = {x:Number(this.newline[i].x2), y:Number(this.newline[i].y2)};
+                            // c = {x:Number(lineInfo.x2), y:Number(lineInfo.y2)};
+                            // d = {x:Number(lineInfo.x1), y:Number(lineInfo.y1)};
+                            // if(this.segmentsIntr(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y)) {
+                            //     console.log("相交1")
+                            //     this.addLines.push(lineInfo);
+                            //     return this.findH(lineInfo);
+                            // }
+                            if(this.newline[i].x1 == lineInfo.x2 && this.newline[i].y1 == lineInfo.y2) {
+                                this.addLines.push(lineInfo);
+                                return this.findH(lineInfo);
+                            }
+                            if(this.newline[i].x2 == lineInfo.x1 && this.newline[i].y2 == lineInfo.y1) {
+                                this.addLines.push(lineInfo);
+                                return this.findH(lineInfo);
+                            }
+                        // }
+                    }
+                }
+            }
+        }
+
+        // findLine2(lineInfo:any) : void {
+        //     if(lineInfo.prev != 0 && lineInfo.next != 0) {//
+        //         for(let i:number = 0; i < this.newline.length; i++) {
+        //             if(this.newline[i].fl == lineInfo.fl) {
+        //                 // if(this.newline[i].x1 == lineInfo.x1 && this.newline[i].y1 == lineInfo.y1 &&
+        //                 // this.newline[i].x2 == lineInfo.x2 && this.newline[i].y2 == lineInfo.y2) {
+        //                 //     //自己需要排除
+        //                 // }
+        //                 // else {
+        //                     let maxY = Math.max(this.newline[i].y1, this.newline[i].y2);
+        //                     if(this.newline[i].x1 == lineInfo.x2 && this.newline[i].y1 == lineInfo.y2) {
+        //                         if(lineInfo.y1 < maxY || lineInfo.y2 < maxY) {
+        //                             this.addLines.push(lineInfo);
+        //                             return this.findH(lineInfo);
+        //                         }
+        //                     }
+        //                     if(this.newline[i].x2 == lineInfo.x1 && this.newline[i].y2 == lineInfo.y1) {
+        //                         if(lineInfo.y1 > maxY || lineInfo.y2 > maxY) {
+        //                             this.addLines.push(lineInfo);
+        //                             return this.findH(lineInfo);
+        //                         }
+        //                     }
+        //                 // }
+        //             }
+        //         }
+        //     }
+        // }
+
+        findH(lineInfo:any) : void {
+            for(let i:number = 0; i < this.newline2.length; i++) {
+                if(this.newline2[i].fl == lineInfo.fl) {
+                    if(this.newline2[i].x1 == lineInfo.x1 && this.newline2[i].y1 == lineInfo.y1 &&
+                    this.newline2[i].x2 == lineInfo.x2 && this.newline2[i].y2 == lineInfo.y2) {
+                        //自己需要排除
+                    }
+                    else {
+                        // let a = {x:Number(this.newline2[i].x1), y:Number(this.newline2[i].y1)};
+                        // let b = {x:Number(this.newline2[i].x2), y:Number(this.newline2[i].y2)};
+                        // let c = {x:Number(lineInfo.x1), y:Number(lineInfo.y1)};
+                        // let d = {x:Number(lineInfo.x2), y:Number(lineInfo.y2)};
+                        // if(this.segmentsIntr(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y)) {
+                        //     console.log("相交12")
+                        //     this.addLines.push(this.newline2[i]);
+                        //     return this.findH(this.newline2[i]);
+                        // }
+                        // a = {x:Number(this.newline2[i].x1), y:Number(this.newline2[i].y1)};
+                        // b = {x:Number(this.newline2[i].x2), y:Number(this.newline2[i].y2)};
+                        // c = {x:Number(lineInfo.x2), y:Number(lineInfo.y2)};
+                        // d = {x:Number(lineInfo.x1), y:Number(lineInfo.y1)};
+                        // if(this.segmentsIntr(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y)) {
+                        //     console.log("相交12")
+                        //     this.addLines.push(this.newline2[i]);
+                        //     return this.findH(this.newline2[i]);
+                        // }
+                        // if(lineInfo.y1 != lineInfo.y2) {
+                            if(this.newline2[i].x1 == lineInfo.x1 && this.newline2[i].y1 == lineInfo.y1) {
+                                this.addLines.push(this.newline2[i]);
+                                return this.findH(this.newline2[i]);
+                            }
+                            if(this.newline2[i].x2 == lineInfo.x1 && this.newline2[i].y2 == lineInfo.y1) {
+                                this.addLines.push(this.newline2[i]);
+                                return this.findH(this.newline2[i]);
+                            }
+                        // }
+                    }
+                }
+            }
+            // for(let i:number = this.newline2.length - 1; i >= 0 ; i--) {
+            //     if(this.newline2[i].fl == lineInfo.fl) {
+            //         if(this.newline2[i].x1 == lineInfo.x1 && this.newline2[i].y1 == lineInfo.y1 &&
+            //         this.newline2[i].x2 == lineInfo.x2 && this.newline2[i].y2 == lineInfo.y2) {
+            //             //自己需要排除
+            //         }
+            //         else {
+
+            //             if(this.newline2[i].x2 == lineInfo.x1 && this.newline2[i].y2 == lineInfo.y1) {
+            //                 this.addLines.push(this.newline2[i]);
+            //                 return this.findH(this.newline2[i]);
+            //             }
+            //             if(this.newline2[i].x1 == lineInfo.x1 && this.newline2[i].y1 == lineInfo.y1) {
+            //                 this.addLines.push(this.newline2[i]);
+            //                 return this.findH(this.newline2[i]);
+            //             }
+            //         }
+            //     }
+            // }
+        }
+
+        minX:number = 999999;
+        maxX:number = -999999;
+        minY:number = 999999;
+        maxY:number = -999999;
+        public loadFoothold(m_map:any, P:any, VRTop:any, VRLeft:any, VRBottom:any, VRRight:any) : any {
+            let mapSize:any = {left:Number(VRLeft), right:Number(VRRight),
+                up:Number(VRTop), down:Number(VRBottom)}
+
+            this.m_parent = P;
+            this.m_sp = new Laya.Image();
+            this.m_sp.zOrder = 99999;
+            this.m_parent.addChild(this.m_sp);
+
+            this.linkfoothold(m_map);
+            this.linkladderRope(m_map);
+
+            if(this.minX != 999999) {
+                if(this.minX >= Number(VRLeft)) {
+                    VRLeft = this.minX;
+                    mapSize.left = this.minX;
+                }
+            }
+            if(this.maxX != -999999) {
+                if(this.maxX <= Number(VRRight)) {
+                    VRRight = this.maxX;
+                    mapSize.right = this.maxX;
+                }
+            }
+            if(this.minY != 999999) {
+                if(this.minY <= Number(VRTop)) {
+                    VRTop = this.minX;
+                    mapSize.up = this.minY;
+                }
+            }
+            if(this.maxY != -999999) {
+                if(this.maxY >= Number(VRBottom)) {
+                    VRBottom = this.maxY;
+                    mapSize.down = this.maxY;
+                }
+                else {
+                    VRBottom = this.maxY + (Number(VRBottom) - this.maxY) / 2;
+                    mapSize.down = VRBottom;
+                }
+            }
+
+            // for(let i:number = 0; i < 4; i++) {
+            //     let spIndex:number = this.spx.length;
+            //     this.spx[spIndex] = new Laya.Sprite();
+            //     this.m_sp.addChild(this.spx[spIndex]);
+            //     if(i == 0)
+            //         this.spx[spIndex].graphics.drawLine( Number(VRLeft), Number(VRTop), Number(VRRight), Number(VRTop), "#ff0000", 3);
+            //     else if(i == 1)
+            //         this.spx[spIndex].graphics.drawLine( Number(VRLeft), Number(VRTop), Number(VRLeft), Number(VRBottom), "#ff0000", 3);
+            //     else if(i == 2)
+            //         this.spx[spIndex].graphics.drawLine( Number(VRLeft), Number(VRBottom), Number(VRRight), Number(VRBottom), "#ff0000", 3);
+            //     else if(i == 3)
+            //         this.spx[spIndex].graphics.drawLine( Number(VRRight), Number(VRTop), Number(VRRight), Number(VRBottom), "#ff0000", 3);
+            // }
+
+
+            //////第一步先把所有的横线/斜线统计出来
+            //////第二步将所有的竖线统计署来
+            /////
+
+            //斜坡
+            // for(let i:number = 0; i < this.newline3.length; i++) {
+            //     this.newline.push(this.newline3[i]);                        //斜坡
+            // }
+            ///补充横线/斜坡遗漏的竖线
+            for(let i:number = 0; i < this.newline2.length; i++) {
+                this.findLine(this.newline2[i]);                            //横行补充竖线,只有一次，二次竖线可能有问题
+            }
+            //补充prev和next为0的纯竖线
+            for(let i:number = 0; i < this.newline2.length; i++) {
+                if(this.newline2[i].prev == 0 || this.newline2[i].next == 0) {//
+                    if(this.find0Line(this.newline2[i], 0) == true) {       //无任何相交的竖线prve/next==0
+                        this.findLine(this.newline2[i]);
+                    }
+                }
+            }
+            //还需要把与斜坡相交的竖线剔除
+            // for(let i:number = 0; i < this.newline2.length; i++) {
+            //     if(this.newline2[i].prev == 0 || this.newline2[i].next == 0) {//
+            //         if(this.find0Line(this.newline2[i], 0) == false) {      //有相交的竖线处理掉prve/next==0
+            //             this.rmvLines.push(this.newline2[i]);
+            //             // this.findRmvLine(this.newline2[i], this.newline2[i].prev, this.newline2[i].next);
+            //         }
+            //     }
+            // }
+            //竖线整理移除合并
+            for(let i:number = 0; i < this.rmvLines.length; i++) {
+                for(let j:number = 0; j < this.addLines.length; j++) {
+                    if(this.addLines[j].fl == this.rmvLines[i].fl) {
+                        if(this.addLines[j].prev == this.rmvLines[i].prev && this.addLines[j].next == this.rmvLines[i].next) {
+                            this.addLines.splice(j, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+            //第一次新增的竖线
+            for(let i:number = 0; i < this.addLines.length; i++) {
+                this.newline.push(this.addLines[i]);
+            }
+
+
+            // for(let i:number = 0; i < this.rmvLines.length; i++) {
+            //     this.new_txt("#" + this.rmvLines[i].next, (this.rmvLines[i].x2 + this.rmvLines[i].x1 ) / 2,  this.rmvLines[i].y1 - 70, 0);
+            //     this.new_txt("!" + this.rmvLines[i].prev, (this.rmvLines[i].x2 + this.rmvLines[i].x1 ) / 2,  this.rmvLines[i].y1 - 50, 0);
+            //     this.new_txt("@" + this.rmvLines[i].z,  (this.rmvLines[i].x2 + this.rmvLines[i].x1 ) / 2, this.rmvLines[i].y1 - 30, 0);
+            // }
+
+
+            for(let i:number = 0; i < this.newline.length; i++) {
+                // if(this.newline[i].x2 == this.newline[i].x1) {
+                    this.new_txt("#" + this.newline[i].next, (this.newline[i].x2 + this.newline[i].x1 ) / 2,  this.newline[i].y1 - 70, 0);
+                    this.new_txt("!" + this.newline[i].prev, (this.newline[i].x2 + this.newline[i].x1 ) / 2,  this.newline[i].y1 - 50, 0);
+                    this.new_txt("@" + this.newline[i].z,  (this.newline[i].x2 + this.newline[i].x1 ) / 2, this.newline[i].y1 - 30, 0);
+                // }
+
+                ////去除无效的wall
+                // if(this.newline[i].x1 == this.newline[i].x2 &&
+                // this.findCount(Number(this.newline[i].prev), Number(this.newline[i].next), this.newline[i].fl) > 1) {
+
+                // }
+                // else {
+                    this.line[this.line.length] = this.newline[i];
+                    let spIndex:number = this.spx.length;
+                    this.spx[spIndex] = new Laya.Sprite();
+                    this.m_sp.addChild(this.spx[spIndex]);
+                    if(this.newline[i].next == 0 || this.newline[i].prev == 0) {
+                        this.spx[spIndex].graphics.drawLine(Number(this.newline[i].x1), Number(this.newline[i].y1),
+                        Number(this.newline[i].x2),  Number(this.newline[i].y2), "#0000ff", 3);
+                    }
+                    else {
+                        this.spx[spIndex].graphics.drawLine(Number(this.newline[i].x1), Number(this.newline[i].y1),
+                        Number(this.newline[i].x2),  Number(this.newline[i].y2), "#ff0000", 3);
+                     }
+                // }
+            }
+
+            // this.line = this.newline;
+
+            m_map["foothold"] = null;
+            m_map["ladderRope"] = null;
+            return mapSize;
+        }
+
+        private linkfoothold(data:any) : void {
+            this.foothold_map = data["foothold"];
+            if(this.foothold_map) {
+                let root:Array<any> = []
+                for(let key in this.foothold_map) {
+                    let _:any = key.split(".");
+                    let footholdkey:string = _[0] + "." + _[1] + "." + _[2] + "." + _[3];
+                    if(msMoudle.findKeyFromArr(footholdkey, root) == false) {
+                        root[root.length] = footholdkey;
+                        this.dofoothold(footholdkey, _[1], _[2], _[3]);
+
+                        // patch.ZIndex[0] = (int)patch.ObjectType;
+                        // patch.ZIndex[1] = _layer;
+                        // patch.ZIndex[2] = _z;
+                        // patch.ZIndex[3] = _fh;
+                    }
+                }
+
+                // for(let i:number = 0; i < this.unshowLst.length; i++) {
+                //     if(this.unshowLst[i].prev == 0) {
+                //         this.findLst(this.unshowLst[i], 1);
+                //     }
+                //     else {
+                //         this.findLst(this.unshowLst[i], 2);
+                //     }
+                //     // this.findAll(this.unshowLst[i].fl);
+                // }
+
+                // msMoudle.toast(this.rmvLines.length + "")
+                // for(let i:number = 0; i < this.rmvLines.length; i++) {
+                //     if(this.rmvLines[i]) {
+                //         let prev = this.rmvLines[i].key.split("_")[0];
+                //         let next = this.rmvLines[i].key.split("_")[1];
+                //         for(let j:number = 0; j < this.newline.length; j++) {
+                //             if(Number(this.newline[j].prev) == Number(prev) && Number(this.newline[j].next == Number(next)) &&
+                //             this.rmvLines[i].fl == this.newline[j].fl) {
+                //                 this.newline.splice(j, 1);
+                //                 break;
+                //             }
+                //         }
+                //     }
+                // }
+            }
+
+            // let missline:Array<any> = [];
+            // for(let i:number = 0; i < this.newline.length; i++) {
+            //     if(this.newline[i].x1 == this.newline[i].x2) {
+            //         let prev:number = Number(this.newline[i].prev);
+            //         let next = Number(this.newline[i].next);
+            //         let num1 = 0;
+            //         let num2 = 0;
+            //         for(let j:number = 0; j < this.newline.length; j++) {
+            //             if(this.newline[j].prev == prev) num1++;
+            //             if(this.newline[j].next == prev) num1++;
+            //             if(this.newline[j].prev == next) num2++;
+            //             if(this.newline[j].next == next) num2++;
+            //             if(num1 >= 2 || num2 >= 2) break;
+            //         }
+            //         if(num1 >= 2 || num2 >= 2) {}
+            //         else {
+            //             missline[missline.length] = i;
+            //         }
+            //     }
+            // }
+
+            // for(let i:number = 0; i < this.newline.length; i++) {
+            //     let _:boolean = true;
+            //     for(let j:number = 0; j < missline.length; j++) {
+            //         if(i == missline[j]) {
+            //             _ = false;
+            //             break;
+            //         }
+            //     }
+            //     if(_) {
+            //         let tIndex:number = this.line.length;
+            //         this.line[this.line.length] = this.newline[i];
+            //     }
+            // }
+        }
+
+        // findCount(prev:number, next:number, fl:any) : number {
+        //     let p1 = 0;
+        //     let p2 = 0;
+        //     for(let i:number = 0; i < this.newline.length; i++) {
+        //         if(this.newline[i].x1 == this.newline[i].x2) {
+        //             if(this.newline[i].prev == prev && fl == this.newline[i].fl) {//&& fl == this.newline[i].fl
+        //                 p1++;
+        //             }
+        //             if(this.newline[i].next == prev && fl == this.newline[i].fl) {
+        //                 p1++;
+        //             }
+        //             if(this.newline[i].prev == next && fl == this.newline[i].fl) {
+        //                 p2++;
+        //             }
+        //             if(this.newline[i].next == next && fl == this.newline[i].fl) {
+        //                 p2++;
+        //             }
+        //         }
+        //     }
+        //     if(p1 > 1 || p2 > 1) return 2;
+
+        //     p1 = 0;
+        //     p2 = 0;
+        //     for(let i:number = 0; i < this.newline.length; i++) {
+        //         if(this.newline[i].y1 == this.newline[i].y2) {
+        //             if(this.newline[i].prev == prev && fl == this.newline[i].fl) {//
+        //                 p1++;
+        //             }
+        //             if(this.newline[i].next == prev && fl == this.newline[i].fl) {
+        //                 p1++;
+        //             }
+        //             if(this.newline[i].prev == next && fl == this.newline[i].fl) {
+        //                 p2++;
+        //             }
+        //             if(this.newline[i].next == next && fl == this.newline[i].fl) {
+        //                 p2++;
+        //             }
+        //         }
+        //     }
+        //     if(p1 == 0 || p2 == 0) return 2;
+        //     return 1;
+        // }
+
+        private linkladderRope(data:any) : void {
+            this.ladderRope_map = data["ladderRope"];
+            if(this.ladderRope_map) {
+                let index:number = 1;
+                while(true) {
+                    let x = this.ladderRope_map["ladderRope." + index + ".x"];
+                    if(x) {
+                        this.doladderRope(x, index);
+                        index = index + 1;
+                    }
+                    else break;
+                }
+            }
+        }
+        //#31 !0 @30 ---- !30 @31
+        //#35 @34 ---- #0 !34 @35
+        // linePos:Array<number> = [];
+        // ropePos:Array<number> = [];
+        rmvLines:Array<any> = [];
+        unshowLst:Array<any> = [];
+        // unlst:Array<any> = [];
+        private dofoothold(footholdkey:string, z:any, z2:any, _3:any) : void {
+
+            // if(msMoudle.findKeyFromArr(z + "." + z2, this.unlst)) return ;
+
+            let x1 = this.foothold_map[footholdkey + ".x1"];
+            let y1 = this.foothold_map[footholdkey + ".y1"];
+            let x2 = this.foothold_map[footholdkey + ".x2"];
+            let y2 = this.foothold_map[footholdkey + ".y2"];
+            let forbidFallDown = this.foothold_map[footholdkey + ".forbidFallDown"];
+            let prev = this.foothold_map[footholdkey + ".prev"];
+            let next = this.foothold_map[footholdkey + ".next"];
+            let fl = "foothold." + z + "." + z2;
+            // <tr><td>foothold.3.16.48.prev</td><td>49</td></tr>
+            // <tr><td>foothold.3.16.48.next</td><td>0</td></tr>
+            // <tr><td>foothold.3.16.49.x1</td><td>-390</td></tr>
+            // <tr><td>foothold.3.16.49.y1</td><td>-360</td></tr>
+            // <tr><td>foothold.3.16.49.x2</td><td>-390</td></tr>
+            // <tr><td>foothold.3.16.49.y2</td><td>-420</td></tr>
+            // <tr><td>foothold.3.16.49.prev</td><td>54</td></tr>
+            // <tr><td>foothold.3.16.49.next</td><td>48</td></tr>
+            // <tr><td>foothold.3.16.50.x1</td><td>-390</td></tr>
+            // <tr><td>foothold.3.16.50.y1</td><td>-240</td></tr>
+            // <tr><td>foothold.3.16.50.x2</td><td>-390</td></tr>
+
+            // if( (Number(prev) == 0 || Number(next) == 0)// || Number(z == 0)
+            // && (Number(y1) != Number(y2)
+            // && Number(x1) == Number(x2))){
+            // // if( (Number(prev) == 0 || Number(next) == 0) ) {
+            //     // this.unlst[this.unlst.length] = z + "." + z2;
+            //     // return ;
+            //     // if(Number(prev) == 0) {
+
+
+            //         // let _ = this.unshowLst.length;
+            //         // this.unshowLst[_] = new Object();
+            //         // this.unshowLst[_].prev = Number(prev);
+            //         // this.unshowLst[_].next = Number(next)
+            //         // this.unshowLst[_].fl = fl;
+
+
+
+            //     // }
+            //     // else {
+            //     //     let _ = this.unshowLstPre.length;
+            //     //     this.unshowLstPre[_] = new Object();
+            //     //     this.unshowLstPre[_].prev = Number(prev);
+            //     //     this.unshowLstPre[_].next = 0;
+            //     //     this.unshowLstPre[_].fl = fl;
+            //     // }
+            // }
+            // else {
+                // if(Number(z) == 0 && Number(x1) == Number(x2)) {
+                // }
+                // else {
+
+                ///如果next和prev是一条纯竖线
+
+                if(x1 != x2) {//
+                    // if(y1 != y2) {
+                    //     let tIndex:number = this.newline3.length;
+                    //     this.newline3[tIndex] = new Object();
+                    //     this.newline3[tIndex].x1 = Number(x1);
+                    //     this.newline3[tIndex].y1 =  Number(y1);
+                    //     this.newline3[tIndex].x2 =  Number(x2);
+                    //     this.newline3[tIndex].y2 =  Number(y2);
+                    //     this.newline3[tIndex].z =  Number(z);
+                    //     this.newline3[tIndex]._3 =  Number(_3);
+                    //     this.newline3[tIndex].prev =  Number(prev);
+                    //     this.newline3[tIndex].next =  Number(next);
+                    //     this.newline3[tIndex].fl = fl;
+                    //     // console.log("xx " + prev + "  " + next + "  " + footholdkey + "  " + _3);
+                    //     //记录最大的层级
+                    //     if(this.maxz < this.newline3[tIndex].z) this.maxz = this.newline3[tIndex].z;
+
+                    //     if(Number(x1) > this.maxX) this.maxX = Number(x1);
+                    //     if(Number(x2) > this.maxX) this.maxX = Number(x2);
+                    //     if(Number(x1) < this.minX) this.minX = Number(x1);
+                    //     if(Number(x2) < this.minX) this.minX = Number(x2);
+
+                    //     if(Number(y1) > this.maxY) this.maxY = Number(y1);
+                    //     if(Number(y2) > this.maxY) this.maxY = Number(y2);
+                    //     if(Number(y1) < this.minY) this.minY = Number(y1);
+                    //     if(Number(y2) < this.minY) this.minY = Number(y2);
+                    // }
+                    // else {
+                        let tIndex:number = this.newline.length;
+                        this.newline[tIndex] = new Object();
+                        this.newline[tIndex].x1 = Number(x1);
+                        this.newline[tIndex].y1 =  Number(y1);
+                        this.newline[tIndex].x2 =  Number(x2);
+                        this.newline[tIndex].y2 =  Number(y2);
+                        this.newline[tIndex].z =  Number(z);
+                        this.newline[tIndex]._3 =  Number(_3);
+                        this.newline[tIndex].prev =  Number(prev);
+                        this.newline[tIndex].next =  Number(next);
+                        this.newline[tIndex].fl = fl;
+                        // console.log("xx " + prev + "  " + next + "  " + footholdkey + "  " + _3);
+                        //记录最大的层级
+                        if(this.maxz < this.newline[tIndex].z) this.maxz = this.newline[tIndex].z;
+
+                        if(Number(x1) > this.maxX) this.maxX = Number(x1);
+                        if(Number(x2) > this.maxX) this.maxX = Number(x2);
+                        if(Number(x1) < this.minX) this.minX = Number(x1);
+                        if(Number(x2) < this.minX) this.minX = Number(x2);
+
+                        if(Number(y1) > this.maxY) this.maxY = Number(y1);
+                        if(Number(y2) > this.maxY) this.maxY = Number(y2);
+                        if(Number(y1) < this.minY) this.minY = Number(y1);
+                        if(Number(y2) < this.minY) this.minY = Number(y2);
+                    // }
+                }
+                else {
+                    if(z > 0) {
+                        let tIndex:number = this.newline2.length;
+                        this.newline2[tIndex] = new Object();
+                        this.newline2[tIndex].x1 = Number(x1);
+                        this.newline2[tIndex].y1 =  Number(y1);
+                        this.newline2[tIndex].x2 =  Number(x2);
+                        this.newline2[tIndex].y2 =  Number(y2);
+                        this.newline2[tIndex].z =  Number(z);
+                        this.newline2[tIndex]._3 =  Number(_3);
+                        this.newline2[tIndex].prev =  Number(prev);
+                        this.newline2[tIndex].next =  Number(next);
+                        this.newline2[tIndex].fl = fl;
+                        // console.log("xx " + prev + "  " + next + "  " + footholdkey + "  " + _3);
+                        //记录最大的层级
+                        if(this.maxz < this.newline2[tIndex].z) this.maxz = this.newline2[tIndex].z;
+
+                        if(Number(x1) > this.maxX) this.maxX = Number(x1);
+                        if(Number(x2) > this.maxX) this.maxX = Number(x2);
+                        if(Number(x1) < this.minX) this.minX = Number(x1);
+                        if(Number(x2) < this.minX) this.minX = Number(x2);
+
+                        if(Number(y1) > this.maxY) this.maxY = Number(y1);
+                        if(Number(y2) > this.maxY) this.maxY = Number(y2);
+                        if(Number(y1) < this.minY) this.minY = Number(y1);
+                        if(Number(y2) < this.minY) this.minY = Number(y2);
+                    }
+                }
+            //}
+        }
+
+        private doladderRope(x:any, index:number) : void {
+            let y1 = this.ladderRope_map["ladderRope." + index + ".y1"];
+            let y2 = this.ladderRope_map["ladderRope." + index + ".y2"];
+            let tIndex:number = this.ladder.length;
+            this.ladder[tIndex] = new Object();
+            this.ladder[tIndex].x1 = Number(x);
+            this.ladder[tIndex].x2 = Number(x);
+            this.ladder[tIndex].y1 = Number(y1);
+            this.ladder[tIndex].y2 = Number(y2);
+
+            // let spIndex:number = this.spx.length;
+            // this.spx[spIndex] = new Laya.Sprite();
+            // this.m_sp.addChild(this.spx[spIndex]);
+            // this.spx[spIndex].graphics.drawLine(Number(x), Number(y1), Number(x),  Number(y2), "#ff0000", 3);
+        }
+
+        public new_txt(str:string, x:number, y:number, index:number) : any {
+            let txt:Laya.Label = new Laya.Label();
+            txt.text = str;
+            txt.fontSize = 14;
+            txt.pos(x, y);
+            txt.color = "#07ec47";
+            txt.stroke = 3;
+            txt.zOrder = 99999999;
+            // txt.on("click", this, this.onClick, [index]);
+            this.m_sp.addChild(txt);
+        }
+
+        //
+    }
+
+}

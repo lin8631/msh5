@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "target": "es5",
+    "outDir": "bin/js",
+    "outFile": "game.min.js",
+    "sourceMap": false,
+    "removeComments": true,
+    "inlineSourceMap": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
+    "allowUnreachableCode": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

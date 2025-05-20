@@ -1,0 +1,48 @@
+{
+  "name": "PlanA",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.14.0",
+    "dustjs-helpers": "^1.7.3",
+    "dustjs-linkedin": "^2.7.4",
+    "glob": "^7.0.6",
+    "glob-array": "^0.1.2",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-copy": "0.0.2",
+    "gulp-pngquant": "^1.0.10",
+    "gulp-run-sequence": "^0.3.2",
+    "gulp-sourcemaps": "^2.0.0-alpha",
+    "gulp-typescript": "^3.0.1",
+    "gulp-uglify": "^2.1.2",
+    "gulp-util": "^3.0.7",
+    "js-beautify": "^1.6.3",
+    "lodash": "^4.15.0",
+    "merge-defaults": "^0.2.1",
+    "merge-stream": "^1.0.1",
+    "minimist": "^1.0.10",
+    "mkdirp": "^0.5.1",
+    "protobufjs": "^5.0.1",
+    "shelljs": "^0.7.4",
+    "string-template": "^1.0.0",
+    "superstatic": "^4.0.3",
+    "through2": "^2.0.1",
+    "typescript": "^2.0.3",
+    "xml2js": "^0.4.17"
+  },
+  "dependencies": {
+    "gm": "^1.23.1",
+    "gulp-minify": "^3.1.0",
+    "gulp-run-command": "0.0.9",
+    "image-size": "^0.9.3",
+    "natives": "^1.1.6",
+    "node-gyp": "^3.8.0"
+  }
+}
