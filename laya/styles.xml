@@ -1,0 +1,6 @@
+<res>
+   <item name="common/progress_3.png" type="ProgressBar" compress="0" pack="0" quality="80" props="sizeGrid=5,10,5,10" picType="0"/>
+   <item name="login/img_login_bg.png" type="Image" compress="0" pack="2" quality="80" props="" picType="0"/>
+   <item name="pet/btn_xuanyao.png" type="Button" compress="0" pack="0" quality="80" props="" picType="0"/>
+   <item name="common/img_common_frame2.png" type="Image" compress="0" pack="0" quality="80" props="" picType="0"/>
+</res>
